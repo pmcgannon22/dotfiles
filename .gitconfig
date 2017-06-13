@@ -1,0 +1,28 @@
+[user]
+	name = Patrick McGannon
+	email = pmcgannon22@gmail.com
+[push]
+    default = simple
+[alias]
+    la = "!git config -l | grep alias | cut -c 7-"
+    aliases = "!git config -l | grep alias | cut -c 7-"
+    cup = stash save --keep-index --include-untracked
+    st = status
+    ci = commit
+    br = branch
+    bra = branch -vv -a
+    co = checkout
+    d = diff
+    ds = diff --stat
+    dc = diff --cached
+    lg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+    history = log --graph --oneline --decorate --all #which one is better?
+    hide = update-index --assume-unchanged
+    unhide = update-index --no-assume-unchanged
+    hidden = "!git ls-files -v | grep '^h'"
+    prune = "fetch --prune origin"
+    prune-all = !git remote | xargs -n 1 git remote prune
+[help]
+    autocorrect = 1
+[core]
+    editor = emacs
