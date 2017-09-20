@@ -20,8 +20,10 @@
     hide = update-index --assume-unchanged
     unhide = update-index --no-assume-unchanged
     hidden = "!git ls-files -v | grep '^h'"
-    prune = "fetch --prune origin"
+    rprune = remote prune origin
     prune-all = !git remote | xargs -n 1 git remote prune
+    delete-remote = push origin --delete
+    find = "!git ls-files | grep -i"
 [help]
     autocorrect = 1
 [core]
