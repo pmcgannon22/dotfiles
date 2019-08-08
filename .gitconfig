@@ -21,7 +21,8 @@
     unhide = update-index --no-assume-unchanged
     hidden = "!git ls-files -v | grep '^h'"
     rprune = remote prune origin
-    prune-all = !git remote | xargs -n 1 git remote prune
+    prune-all = !git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D
+    oldbranches = !git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}'
     delete-remote = push origin --delete
     find = "!git ls-files | grep -i"
 [help]
