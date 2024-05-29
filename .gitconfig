@@ -1,20 +1,36 @@
-[user]
-	name = Patrick McGannon
-	email = pmcgannon22@gmail.com
+#
+# To include this file, edit your ~/.gitconfig or %USERPROFILE%/.gitconfig and add:
+# [include]
+#	 path = "C:/Users/patmcg/OneDrive - Microsoft/configs/.gitconfig"
+#
+# Make sure to add the right user
+# [user]
+#   name = <name>
+#   email = <email>
 [push]
     default = simple
+
 [alias]
     la = "!git config -l | grep alias | cut -c 7-"
     aliases = "!git config -l | grep alias | cut -c 7-"
+    
+    ac = !git add -A && git commit -m
+    
+    current = rev-parse --abbrev-ref HEAD
+    
+    psu = !CURRENT=$(git current) && git push --set-upstream origin $CURRENT
+    
     cup = stash save --keep-index --include-untracked
     st = status
     ci = commit
     br = branch
     bra = branch -vv -a
     co = checkout
+    cob = checkout -b
     d = diff
     ds = diff --stat
     dc = diff --cached
+    fdiff = diff --name-only
     lg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
     history = log --graph --oneline --decorate --all #which one is better?
     hide = update-index --assume-unchanged
@@ -24,8 +40,40 @@
     prune-all = !git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D
     oldbranches = !git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}'
     delete-remote = push origin --delete
-    find = "!git ls-files | grep -i"
+    undo-last-commit = "!f() { \
+        git reset --hard $1; \
+          }; f"
+    rsh = !git undo-last-commit
+    
+    undo-last-and-keep = "!f() { \
+        git reset --soft HEAD~$1; \
+          }; f"
+    rss = !git undo-last-and-keep
+    recents = branch --sort=-committerdate
+    last = co - # this goes to the last used branch or 'co @{-1}' 
+    
+    wt = worktree
+    wt-rm = worktree remove
+    wtl = worktree list
+    
+    # takes in <branch-name> <new-directory>
+    wt-new = git worktree add -b
+    
+    # takes in EXISTING <branch-name> <new-directory>
+    wt-add = gt worktree add
+[credential]
+    helper = manager-core
 [help]
     autocorrect = 1
 [core]
-    editor = emacs
+# update here
+    editor = C:/Users/patmcg/npp.sh
+    ignorecase = false
+[winUpdater]
+    recentlySeenVersion = 2.26.2.windows.1
+    [filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+
