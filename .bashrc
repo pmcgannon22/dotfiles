@@ -1,6 +1,8 @@
 alias ls='ls -Fa --color --show-control-chars'
 alias less='less -r'
 
+export CLICOLOR=1
+
 # Use cheat.sh
 cheat() {
   # Ask cheat.sh website for details about a Linux command.
