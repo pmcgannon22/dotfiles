@@ -66,7 +66,6 @@
 [help]
     autocorrect = 1
 [core]
-# update here
     editor = C:/Users/patmcg/npp.sh
     ignorecase = false
 [winUpdater]
