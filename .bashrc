@@ -1,4 +1,4 @@
-alias ls='ls -Fa --color --show-control-chars'
+alias ls='ls -Fa --color'
 alias less='less -r'
 
 export CLICOLOR=1
