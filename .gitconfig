@@ -11,56 +11,158 @@
     default = simple
 
 [alias]
-    la = "!git config -l | grep alias | cut -c 7-"
-    aliases = "!git config -l | grep alias | cut -c 7-"
-    
-    ac = !git add -A && git commit -m
-    
+    # ---- discovery / listing ----
+    la = "!git config -l | grep '^alias\\.' | cut -c 7-"
+    aliases = "!git config -l | grep '^alias\\.' | cut -c 7-"
+    alias-help = "!f() { \
+printf '\\n%-20s | %-60s | %s\\n' \"Alias\" \"Description\" \"Command\"; \
+printf '%s\\n' \"$(printf '%.0s-' {1..140})\"; \
+git config --name-only --get-regexp '^alias\\.' 2>/dev/null \
+| sed 's/^alias\\.//' \
+| grep -v '^alias-help$' \
+| while read -r name; do \
+cmd=$(git config \"alias.$name\"); \
+doc=$(git config \"alias-docs.$name\" 2>/dev/null || true); \
+printf '%-20s | %-60s | %s\\n' \"$name\" \"${doc:-<no doc>}\" \"$cmd\"; \
+  done \
+| sort; \
+echo; \
+}; f"
+
+    # ---- add/commit flows ----
+    ac = "!git add -A && git commit -m"
+    au = add -u
+    auc = "!git add -u && git commit -m"
+
+    # ---- branch name / push upstream ----
     current = rev-parse --abbrev-ref HEAD
-    
-    psu = !CURRENT=$(git current) && git push --set-upstream origin $CURRENT
-    
+    psu = "!CURRENT=$(git current) && git push --set-upstream origin \"$CURRENT\""
+
+    # ---- stash / status / basic verbs ----
     cup = stash save --keep-index --include-untracked
     st = status
     ci = commit
     br = branch
     bra = branch -vv -a
+
+    # ---- switching / creating branches ----
     co = checkout
+    s = switch
     cob = checkout -b
+
+    # ---- diff views ----
     d = diff
     ds = diff --stat
     dc = diff --cached
     fdiff = diff --name-only
+    prdiff = "!f() { \
+      git diff --name-only origin/main... | fzf \
+        --preview 'git diff --color=always origin/main... -- {}' \
+        --preview-window=right:70%:wrap \
+        --bind 'ctrl-u:preview-up,ctrl-d:preview-down,pgup:preview-page-up,pgdn:preview-page-down'; \
+    }; f"
+
+    # ---- logs ----
     lg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
-    history = log --graph --oneline --decorate --all #which one is better?
+    history = log --graph --oneline --decorate --all
+
+    # ---- hide/unhide tracked files locally ----
     hide = update-index --assume-unchanged
     unhide = update-index --no-assume-unchanged
     hidden = "!git ls-files -v | grep '^h'"
+
+    # ---- remote pruning / dead branches ----
     rprune = remote prune origin
-    prune-all = !git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D
-    oldbranches = !git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}'
+    prune-all = "!git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs -r git branch -D"
+    oldbranches = "!git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}'"
     delete-remote = push origin --delete
-    undo-last-commit = "!f() { \
-        git reset --hard $1; \
-          }; f"
-    rsh = !git undo-last-commit
-    
-    undo-last-and-keep = "!f() { \
-        git reset --soft HEAD~$1; \
-          }; f"
-    rss = !git undo-last-and-keep
+
+    # ---- resets / undo helpers ----
+    undo-last-commit = "!f() { git reset --hard \"${1:-HEAD~1}\"; }; f"
+    rsh = "!git undo-last-commit"
+    undo-last-and-keep = "!f() { git reset --soft \"HEAD~${1:-1}\"; }; f"
+    rss = "!git undo-last-and-keep"
+
+    # ---- branch discovery ----
     recents = branch --sort=-committerdate
-    last = co - # this goes to the last used branch or 'co @{-1}' 
-    
+    mine = "!git branch --remote | grep 'users/patmcg'"
+    last = checkout -
+
+    # ---- worktree helpers ----
     wt = worktree
     wt-rm = worktree remove
     wtl = worktree list
-    
     # takes in <branch-name> <new-directory>
-    wt-new = git worktree add -b
-    
-    # takes in EXISTING <branch-name> <new-directory>
-    wt-add = gt worktree add
+    wt-new = worktree add -b
+    # takes in EXISTING <new-directory> <branch-name>
+    wt-add = worktree add
+
+[alias-docs]
+    # ---- discovery / listing ----
+    la = List all alias definitions via raw config dump (alias.<name>=<cmd>).
+    aliases = Same as `la` - quick alias lister.
+    alias-help = Pretty, self-documenting alias table: shows alias name, its doc (from [alias-docs]), and the expanded command.
+
+    # ---- add/commit flows ----
+    ac = Stage all changes (add/remove/modify) then commit with a provided message. Usage: `git ac "<message>"`.
+    au = Stage only modified/deleted tracked files (no new untracked files).
+    auc = Stage modified/deleted tracked files, then commit with a provided message. Usage: `git auc "<message>"`.
+
+    # ---- branch name / push upstream ----
+    current = Print the current branch name (equivalent to `git rev-parse --abbrev-ref HEAD`).
+    psu = Push current branch and set upstream to origin/<branch> (handy on first push).
+
+    # ---- stash / status / basic verbs ----
+    cup = Stash working tree including untracked files while keeping the index staged (`stash save --keep-index --include-untracked`).
+    st = Short for `status`.
+    ci = Short for `commit`.
+    br = Short for `branch`.
+    bra = Show all branches with upstream and last-commit info (`-vv -a`).
+
+    # ---- switching / creating branches ----
+    co = Short for `checkout`.
+    s = Short for `switch` (modern alternative to `checkout` for branches).
+    cob = Create and checkout a new branch. Usage: `git cob <branch>`.
+
+    # ---- diff views ----
+    d = Full diff against index/HEAD.
+    ds = Diff summary (file stats only).
+    dc = Diff of staged changes (what will be committed).
+    fdiff = List only filenames that differ.
+    prdiff = PR-like view with FZF interactive view.
+
+    # ---- logs ----
+    lg = Pretty all-branches graph with abbreviated SHAs, dates, authors, and decorations.
+    history = Compact one-line graph across all refs with decorations.
+
+    # ---- hide/unhide tracked files locally ----
+    hide = Mark a tracked file as assumed-unchanged (local performance/ignore hint).
+    unhide = Clear the assumed-unchanged bit.
+    hidden = List files currently marked as hidden/assumed-unchanged.
+
+    # ---- remote pruning / dead branches ----
+    rprune = Prune stale remote-tracking refs from origin.
+    prune-all = Delete local branches whose upstream is gone (after fetch -p). Destructive - review with `oldbranches` first.
+    oldbranches = Preview local branches whose upstream is gone (after fetch -p).
+    delete-remote = Delete a remote branch. Usage: `git delete-remote <branch>`.
+
+    # ---- resets / undo helpers ----
+    undo-last-commit = Hard reset to a ref (defaults to HEAD~1 if none supplied). DANGER: discards local changes.
+    rsh = Shorthand for `undo-last-commit`.
+    undo-last-and-keep = Soft reset N commits (default 1) keeping all changes staged. Usage: `git rss [N]`.
+    rss = Shorthand for `undo-last-and-keep`.
+
+    # ---- branch discovery ----
+    recents = List branches sorted by most recent commit time.
+    mine = Show remote branches under users/patmcg/*.
+    last = Jump back to the previously checked out branch.
+
+    # ---- worktree helpers ----
+    wt = Short for `worktree`.
+    wt-rm = Remove a worktree (use with care if there are uncommitted changes).
+    wtl = List all worktrees.
+    wt-new = Create a new worktree and a new branch in one go. Usage: `git wt-new <branch-name> <new-directory>`.
+    wt-add = Attach an existing directory as a worktree for an existing branch. Usage: `git wt-add <existing-dir> <branch-name>`.
 [credential]
     helper = manager-core
 [help]
@@ -75,4 +177,3 @@
     smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
     required = true
-
