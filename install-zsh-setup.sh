@@ -110,8 +110,15 @@ detect_platform() {
 
 ensure_command() {
     local cmd="$1"
-    local brew_pkg="${2:-$1}"
-    local apt_pkg="${3:-$2}"
+    local brew_pkg="${2:-}"
+    local apt_pkg="${3:-}"
+
+    if [[ -z "$brew_pkg" ]]; then
+        brew_pkg="$cmd"
+    fi
+    if [[ -z "$apt_pkg" ]]; then
+        apt_pkg="$brew_pkg"
+    fi
 
     if command -v "$cmd" >/dev/null 2>&1; then
         print_success "$cmd is installed: $(command -v "$cmd")"
