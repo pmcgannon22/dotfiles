@@ -1,9 +1,6 @@
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Skip compaudit prompts that would otherwise disable completions
-export ZSH_DISABLE_COMPFIX="true"
-
 # Set name of the theme to load
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="robbyrussell"
@@ -17,6 +14,18 @@ plugins=(git z zsh-autosuggestions zsh-history-substring-search zsh-syntax-highl
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
+
+# Skip compaudit prompts that would otherwise disable completions
+export ZSH_DISABLE_COMPFIX="true"
+
+# Initialize Zsh's completion system.
+# `autoload -Uz compinit` loads the compinit function from Zsh's standard library.
+# `compinit -u` sets up completion in "unsafe" mode, skipping permission checks
+# to avoid compaudit warnings on macOS/WSL where directory permissions can vary.
+# This enables tab-completion for commands, options, and plugins.
+autoload -Uz compinit
+compinit -u
+
 
 # history setup
 setopt APPEND_HISTORY
@@ -49,33 +58,69 @@ zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]}' '' '' '+'
 zstyle ':completion:*' menu select=1
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 
-# Initialize autocompletion (skip secure-dir checks so completion never aborts)
-if ! typeset -p _comps > /dev/null 2>&1; then
-  autoload -Uz compinit
-  compinit -u
-fi
-
 # Set the suggestion color to a more visible option (e.g., light gray)
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#808080'
 
-# fzf integration
-if [ -f "$HOME/.fzf.zsh" ]; then
-  source "$HOME/.fzf.zsh"
+# fzf defaults: layout, border, info line, etc.
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --info=inline'
+
+# Use fd (if available) for faster/better file search
+if command -v fd >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 else
-  if command -v brew > /dev/null 2>&1; then
-    _dotfiles_fzf_dir="$(brew --prefix 2>/dev/null)/opt/fzf"
-    [ -r "${_dotfiles_fzf_dir}/shell/key-bindings.zsh" ] && source "${_dotfiles_fzf_dir}/shell/key-bindings.zsh"
-    [ -r "${_dotfiles_fzf_dir}/shell/completion.zsh" ] && source "${_dotfiles_fzf_dir}/shell/completion.zsh"
+  # Fallback to find
+  export FZF_DEFAULT_COMMAND='find . -type f -not -path "*/\.git/*"'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND='find . -type d -not -path "*/\.git/*"'
+fi
+
+# Make fzf completion explicit with '**'
+export FZF_COMPLETION_TRIGGER='**'
+
+# Per-widget tweaks
+export FZF_CTRL_R_OPTS='--sort --exact --height=40% --border'
+export FZF_CTRL_T_OPTS='--preview "head -100 {}"'
+export FZF_ALT_C_OPTS='--preview "ls -lh {}"'
+
+# fzf integration: history, files, directories, and fuzzy completion
+
+if command -v fzf >/dev/null 2>&1; then
+  # 1) Prefer ~/.fzf.zsh if installed from upstream script
+  if [ -f "$HOME/.fzf.zsh" ]; then
+    source "$HOME/.fzf.zsh"
+  else
+    # 2) Homebrew (if you ever use it inside WSL)
+    if command -v brew > /dev/null 2>&1; then
+      _dotfiles_fzf_dir="$(brew --prefix 2>/dev/null)/opt/fzf"
+      [ -r "${_dotfiles_fzf_dir}/shell/key-bindings.zsh" ] && source "${_dotfiles_fzf_dir}/shell/key-bindings.zsh"
+      [ -r "${_dotfiles_fzf_dir}/shell/completion.zsh" ]   && source "${_dotfiles_fzf_dir}/shell/completion.zsh"
+    fi
+
+    # 3) Ubuntu/Debian package paths
+    for _fzf_binding in \
+      /usr/share/doc/fzf/examples/key-bindings.zsh \
+      /usr/share/fzf/key-bindings.zsh \
+      /usr/local/share/fzf/key-bindings.zsh
+    do
+      [ -r "$_fzf_binding" ] && source "$_fzf_binding"
+    done
+
+    for _fzf_completion in \
+      /usr/share/doc/fzf/examples/completion.zsh \
+      /usr/share/fzf/completion.zsh \
+      /usr/local/share/fzf/completion.zsh
+    do
+      [ -r "$_fzf_completion" ] && source "$_fzf_completion"
+    done
   fi
-  for _fzf_binding in /usr/share/fzf/key-bindings.zsh /usr/local/share/fzf/key-bindings.zsh; do
-    [ -r "$_fzf_binding" ] && source "$_fzf_binding"
-  done
-  for _fzf_completion in /usr/share/fzf/completion.zsh /usr/local/share/fzf/completion.zsh; do
-    [ -r "$_fzf_completion" ] && source "$_fzf_completion"
-  done
+
   unset _dotfiles_fzf_dir _fzf_binding _fzf_completion
-  if command -v fzf > /dev/null 2>&1; then
-    source <(fzf --zsh) 2>/dev/null || true
+
+  # Force Ctrl-R to use fzf if the widget exists
+  if (( $+functions[fzf-history-widget] )); then
+    bindkey '^R' fzf-history-widget
   fi
 fi
 
