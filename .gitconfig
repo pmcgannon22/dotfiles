@@ -170,7 +170,7 @@ echo; \
 [help]
     autocorrect = 1
 [core]
-    editor = C:/Users/patmcg/npp.sh
+    editor = nvim 
     ignorecase = false
 [winUpdater]
     recentlySeenVersion = 2.26.2.windows.1
