@@ -1,0 +1,49 @@
+[
+  // ==========================================================================
+  // Zed Tasks — common build & test commands
+  // Symlink to: %APPDATA%\Zed\tasks.json
+  // ==========================================================================
+
+  // -- Java (Maven) --
+  {
+    "label": "Java: Build (Maven)",
+    "command": "mvn compile",
+    "reveal": "always",
+    "hide": "on_success",
+    "save": "all"
+  },
+  {
+    "label": "Java: Test (Maven)",
+    "command": "mvn test",
+    "reveal": "always",
+    "save": "all"
+  },
+  {
+    "label": "Java: Build (Gradle)",
+    "command": "./gradlew build",
+    "reveal": "always",
+    "hide": "on_success",
+    "save": "all"
+  },
+
+  // -- C# / .NET --
+  {
+    "label": "C#: Build (dotnet)",
+    "command": "dotnet build",
+    "reveal": "always",
+    "hide": "on_success",
+    "save": "all"
+  },
+  {
+    "label": "C#: Test (dotnet)",
+    "command": "dotnet test",
+    "reveal": "always",
+    "save": "all"
+  },
+  {
+    "label": "C#: Run (dotnet)",
+    "command": "dotnet run",
+    "reveal": "always",
+    "save": "all"
+  }
+]

@@ -1,0 +1,78 @@
+[
+  // ==========================================================================
+  // Zed Keymap — mirrors LazyVim keybindings from dotfiles/nvim/
+  // Symlink to: %APPDATA%\Zed\keymap.json
+  // ==========================================================================
+
+  // -- Insert mode: jk to exit (common Vim pattern) --
+  {
+    "context": "VimControl && vim_mode == insert",
+    "bindings": {
+      "j k": ["vim::SwitchMode", "Normal"]
+    }
+  },
+
+  // -- Normal mode: LazyVim-style leader (space) bindings --
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      // Buffer navigation (LazyVim: Shift-H/L to cycle buffers)
+      "shift-h": "pane::ActivatePrevItem",
+      "shift-l": "pane::ActivateNextItem",
+
+      // File explorer toggle (LazyVim: <leader>e)
+      "space e": "workspace::ToggleLeftDock",
+
+      // Project-wide search (LazyVim: <leader>/)
+      "space /": "workspace::NewSearch",
+
+      // Find files (LazyVim: <leader>ff / Telescope find_files)
+      "space f f": "file_finder::Toggle",
+
+      // Recent files (LazyVim: <leader>fr)
+      "space f r": "recent_projects::OpenRecent",
+
+      // Save file (LazyVim: <leader>w)
+      "space w": "workspace::Save",
+
+      // Close buffer (LazyVim: <leader>bd)
+      "space b d": "pane::CloseActiveItem",
+
+      // Diagnostics panel (LazyVim: <leader>xx / Trouble)
+      "space x x": "diagnostics::Deploy",
+
+      // Terminal toggle (LazyVim: <C-/>)
+      "space t t": "terminal_panel::ToggleFocus",
+
+      // Code actions (LazyVim: <leader>ca)
+      "space c a": "editor::ToggleCodeActions",
+
+      // Rename symbol (LazyVim: <leader>cr)
+      "space c r": "editor::Rename",
+
+      // Find all references (supplement to built-in g A)
+      "space g r": "editor::FindAllReferences",
+
+      // Format file (LazyVim: <leader>cf)
+      "space c f": "editor::Format",
+
+      // Split management (LazyVim: <leader>- and <leader>|)
+      "space -": "pane::SplitDown",
+      "space |": "pane::SplitRight"
+    }
+  },
+
+  // -- Project Panel: Neo-tree style file management keys --
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "a": "project_panel::NewFile",
+      "shift-a": "project_panel::NewDirectory",
+      "r": "project_panel::Rename",
+      "d": "project_panel::Delete",
+      "x": "project_panel::Cut",
+      "c": "project_panel::Copy",
+      "p": "project_panel::Paste"
+    }
+  }
+]

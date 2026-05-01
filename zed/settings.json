@@ -1,0 +1,62 @@
+{
+  // ==========================================================================
+  // Zed Settings — mirrors Neovim (LazyVim) config from dotfiles/nvim/
+  // Symlink to: %APPDATA%\Zed\settings.json
+  // ==========================================================================
+
+  // -- Vim Mode --
+  "vim_mode": true,
+  "relative_line_numbers": true,
+
+  // -- Appearance --
+  "theme": "Tokyo Night",
+  "buffer_font_size": 14,
+  "buffer_font_family": "JetBrainsMono Nerd Font",
+  "ui_font_size": 14,
+  "ui_font_family": "JetBrainsMono Nerd Font",
+
+  // -- Editor Behavior --
+  "format_on_save": "on",
+  "remove_trailing_whitespace_on_save": true,
+  "ensure_final_newline_on_save": true,
+  "tab_size": 2,
+  "show_whitespaces": "all",
+  "scroll_beyond_last_line": "off",
+
+  // -- Project Panel (Neo-tree equivalent: show dotfiles & gitignored) --
+  "file_scan_exclusions": [],
+
+  // -- Terminal (pwsh on Windows, matching nvim options.lua) --
+  "terminal": {
+    "shell": {
+      "program": "pwsh"
+    },
+    "font_size": 14,
+    "font_family": "JetBrainsMono Nerd Font"
+  },
+
+  // -- AI / Copilot (matching lazyvim.plugins.extras.ai.copilot-native) --
+  "features": {
+    "edit_prediction_provider": "copilot"
+  },
+
+  // -- Language Overrides --
+  "languages": {
+    // Java: 4-space indent, no autoformat (matching ftplugin/java.lua)
+    // Formatter set to google-java-format AOSP style (matching plugins/java.lua)
+    "Java": {
+      "tab_size": 4,
+      "format_on_save": "off",
+      "formatter": {
+        "external": {
+          "command": "google-java-format",
+          "arguments": ["--aosp", "-"]
+        }
+      }
+    },
+    // C#: 4-space indent (common convention, Roslyn default)
+    "C#": {
+      "tab_size": 4
+    }
+  }
+}
