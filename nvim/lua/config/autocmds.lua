@@ -8,12 +8,31 @@
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
 -- Auto-fold import blocks when a file is first opened.
+-- Retries until treesitter has computed fold levels.
 local import_patterns = { "^import ", "^using ", "^from " }
-local import_filetypes = { "java", "cs", "typescript", "typescriptreact", "javascript", "javascriptreact", "python", "go", "kotlin" }
 
-local function fold_imports()
-  local line_count = vim.api.nvim_buf_line_count(0)
-  local lines = vim.api.nvim_buf_get_lines(0, 0, math.min(120, line_count), false)
+local function fold_imports(attempts)
+  attempts = attempts or 0
+  local scan = math.min(120, vim.api.nvim_buf_line_count(0))
+  local lines = vim.api.nvim_buf_get_lines(0, 0, scan, false)
+
+  local has_folds = false
+  for i = 1, scan do
+    if vim.fn.foldlevel(i) > 0 then
+      has_folds = true
+      break
+    end
+  end
+
+  if not has_folds then
+    if attempts < 15 then
+      vim.defer_fn(function()
+        fold_imports(attempts + 1)
+      end, 200)
+    end
+    return
+  end
+
   for i, line in ipairs(lines) do
     for _, pat in ipairs(import_patterns) do
       if line:match(pat) then
@@ -26,11 +45,10 @@ local function fold_imports()
   end
 end
 
-vim.api.nvim_create_autocmd("BufReadPost", {
+vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("fold-imports", { clear = true }),
+  pattern = { "java", "cs", "typescript", "typescriptreact", "javascript", "javascriptreact", "python", "go", "kotlin" },
   callback = function()
-    if vim.tbl_contains(import_filetypes, vim.bo.filetype) then
-      vim.defer_fn(fold_imports, 150)
-    end
+    vim.defer_fn(fold_imports, 200)
   end,
 })
