@@ -31,6 +31,16 @@ return {
     opts = function(_, opts)
       opts.dap_main = false
 
+      -- Stop Neovim's libuv file watcher from recursively watching the whole
+      -- project tree (a major freeze source in large repos); let jdtls watch.
+      opts.jdtls = vim.tbl_deep_extend("force", opts.jdtls or {}, {
+        capabilities = {
+          workspace = {
+            didChangeWatchedFiles = { dynamicRegistration = false },
+          },
+        },
+      })
+
       opts.project_name = function(root_dir)
         if not root_dir then
           return nil

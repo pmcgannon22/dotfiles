@@ -2,7 +2,12 @@ return {
   {
     "seblyng/roslyn.nvim",
     ft = "cs",
-    opts = {},
+    opts = {
+      -- Hand file watching off to the Roslyn server instead of Neovim's
+      -- libuv watcher, which recursively walks the whole solution tree and
+      -- floods the event loop in large repos.
+      filewatching = "roslyn",
+    },
   },
 
   {
