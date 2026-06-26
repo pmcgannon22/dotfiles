@@ -52,3 +52,19 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.defer_fn(fold_imports, 200)
   end,
 })
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = vim.api.nvim_create_augroup("trim-whitespace", { clear = true }),
+  pattern = "*",
+  callback = function(args)
+    if vim.bo[args.buf].buftype ~= "" or vim.bo[args.buf].binary or not vim.bo[args.buf].modifiable then
+      return
+    end
+
+    local view = vim.fn.winsaveview()
+    vim.api.nvim_buf_call(args.buf, function()
+      vim.cmd([[silent! keepjumps keeppatterns %s/[ \t]\+$//e]])
+    end)
+    vim.fn.winrestview(view)
+  end,
+})
