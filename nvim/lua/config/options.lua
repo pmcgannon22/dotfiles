@@ -31,3 +31,36 @@ else
 end
 
 vim.lsp.set_log_level("ERROR")
+
+-- Neovide-only settings. These have no effect in terminal Neovim.
+if vim.g.neovide then
+  vim.g.neovide_scale_factor = 1.0
+  vim.g.neovide_padding_top = 0
+  vim.g.neovide_padding_bottom = 0
+  vim.g.neovide_padding_left = 0
+  vim.g.neovide_padding_right = 0
+
+  vim.g.neovide_cursor_animation_length = 0.05
+  vim.g.neovide_cursor_trail_size = 0.2
+  vim.g.neovide_scroll_animation_length = 0.2
+  vim.g.neovide_scroll_animation_far_lines = 1
+  vim.g.neovide_position_animation_length = 0.1
+
+  vim.g.neovide_hide_mouse_when_typing = true
+  vim.g.neovide_theme = "auto"
+
+  -- System clipboard paste in insert/command modes (Windows/Linux convention).
+  vim.keymap.set({ "n", "v" }, "<C-S-c>", '"+y', { desc = "Copy to system clipboard" })
+  vim.keymap.set({ "n", "v" }, "<C-S-v>", '"+P', { desc = "Paste from system clipboard" })
+  vim.keymap.set("i", "<C-S-v>", "<C-r><C-o>+", { desc = "Paste from system clipboard" })
+  vim.keymap.set("c", "<C-S-v>", "<C-r>+", { desc = "Paste from system clipboard" })
+  vim.keymap.set("t", "<C-S-v>", [[<C-\><C-n>"+Pi]], { desc = "Paste from system clipboard" })
+
+  -- Dynamic font scaling (handy for presentations / quick zoom).
+  local function change_scale(delta)
+    vim.g.neovide_scale_factor = math.max(0.5, (vim.g.neovide_scale_factor or 1.0) + delta)
+  end
+  vim.keymap.set("n", "<C-=>", function() change_scale(0.1) end, { desc = "Neovide: zoom in" })
+  vim.keymap.set("n", "<C-->", function() change_scale(-0.1) end, { desc = "Neovide: zoom out" })
+  vim.keymap.set("n", "<C-0>", function() vim.g.neovide_scale_factor = 1.0 end, { desc = "Neovide: reset zoom" })
+end
