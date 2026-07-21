@@ -13,6 +13,12 @@ If you copy this whole `nvim` folder to a new machine, these files are the parts
 
 ## Current language/tooling customizations
 
+### WSL2 clipboard
+
+- Uses Windows interoperability for the `+` and `*` registers when Neovim runs under WSL
+- Copies through `clip.exe` and pastes through PowerShell's `Get-Clipboard`
+- Requires Windows interoperability to be enabled in WSL
+
 ### Java
 
 - Enables the LazyVim Java extra from `lazyvim.json`

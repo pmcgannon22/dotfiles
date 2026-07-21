@@ -24,6 +24,24 @@ _G.title_project = title_project
 vim.o.title = true
 vim.o.titlestring = "📝 %{v:lua.title_project()}%( %M%)"
 
+if vim.fn.has("wsl") == 1 then
+  local paste_command =
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoLogo -NoProfile -Command '$text = Get-Clipboard -Raw; if ($null -ne $text) { [Console]::Out.Write($text.Replace(\"`r\", \"\")) }'"
+
+  vim.g.clipboard = {
+    name = "WSL clipboard",
+    copy = {
+      ["+"] = "/mnt/c/Windows/System32/clip.exe",
+      ["*"] = "/mnt/c/Windows/System32/clip.exe",
+    },
+    paste = {
+      ["+"] = paste_command,
+      ["*"] = paste_command,
+    },
+    cache_enabled = 0,
+  }
+end
+
 if vim.fn.has("win32") == 1 then
   LazyVim.terminal.setup("pwsh")
 else
