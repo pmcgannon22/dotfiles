@@ -6,10 +6,20 @@ Refer to the [documentation](https://lazyvim.github.io/installation) to get star
 ## My customizations (non-default LazyVim)
 
 - `lua/config/options.lua`: local option overrides (terminal title, etc.)
+- `lua/config/keymaps.lua`: custom keymap overrides (see below)
 - `lua/plugins/*.lua`: custom plugin specs and overrides (`csharp.lua`, `java.lua`, `octo.lua`)
 - `ftplugin/*.lua`: filetype-local settings (`ftplugin/java.lua`)
 
 If you copy this whole `nvim` folder to a new machine, these files are the parts that differ from stock LazyVim behavior.
+
+## Custom keymaps
+
+| Key | Action |
+|-----|--------|
+| `jj` | Exit insert mode (alias for `<Esc>`) |
+| `<leader><leader>` | Smart file search, scoped to the Neovim launch directory (not the current buffer's detected root) |
+
+The `<leader><leader>` override prevents the search scope from drifting when jumping between files in different subtrees — a common issue in WSL where nested `.git` markers cause `LazyVim.root()` to re-scope per buffer.
 
 ## Current language/tooling customizations
 
