@@ -35,6 +35,51 @@ If you copy this whole `nvim` folder to a new machine, these files are the parts
 
 ## Newest plugin additions
 
+### Neovim practice tools
+
+#### Precognition (`tris203/precognition.nvim`)
+
+Precognition displays contextual motion and text-object hints directly in the current buffer.
+
+- `:Precognition toggle` - toggle hints for the current session
+- `:Precognition show` - show hints
+- `:Precognition hide` - hide hints
+- `:Precognition peek` - show hints until the next cursor movement
+
+#### Hardtime (`m4xshen/hardtime.nvim`)
+
+Hardtime watches for repetitive movement habits and suggests more effective Vim motions. This configuration uses
+hint-only restrictions and leaves the mouse and arrow keys available. Its local adapter also restores any existing
+Normal-mode mappings after Hardtime is disabled, so toggling it does not remove LazyVim or custom mappings.
+
+- `:Hardtime toggle` - toggle Hardtime for the current Neovim session
+- `:Hardtime enable` - enable Hardtime
+- `:Hardtime disable` - disable Hardtime
+- `:Hardtime report` - show the most frequently encountered hints
+
+Hardtime starts enabled. To change that default, set `enabled = false` in `lua/plugins/hardtime.lua`.
+
+#### Key usage logging
+
+`KeyUsage` is a custom, repository-local Lua module in `lua/key_usage/init.lua`; it is not an external Neovim
+plugin. It records all user-typed input in Normal, operator-pending, Visual, and Select modes. It does not record
+Insert/Replace text, command-line or search text, or terminal input. Each event contains the typed key sequence,
+mode, filetype, buffer type, timing, and matching keymap description when one can be resolved.
+
+Events are buffered and written as daily JSONL files under `stdpath("state")/key-usage`. Run `:KeyUsage path` to
+show the exact directory for the current machine.
+
+- `:KeyUsage` or `:KeyUsage status` - show whether logging is enabled
+- `:KeyUsage toggle` - toggle logging for the current session
+- `:KeyUsage enable` - enable logging
+- `:KeyUsage disable` - flush pending events and disable logging
+- `:KeyUsage flush` - immediately write pending events
+- `:KeyUsage path` - show the log directory
+
+The logger intentionally stores low-level events rather than guessing at complete Vim commands. Later reporting can
+combine these events with keymap metadata to derive semantic actions without changing mapping behavior. Normal-mode
+character arguments such as the target of `f`, `t`, or `r` are part of the recorded key stream.
+
 ### Octo (`pwntester/octo.nvim`)
 
 Octo is configured in `lua/plugins/octo.lua` and lazy-loads on the `:Octo` command or the custom mappings below.
