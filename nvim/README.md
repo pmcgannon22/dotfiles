@@ -7,7 +7,7 @@ Refer to the [documentation](https://lazyvim.github.io/installation) to get star
 
 - `lua/config/options.lua`: local option overrides (terminal title, etc.)
 - `lua/config/keymaps.lua`: custom keymap overrides (see below)
-- `lua/plugins/*.lua`: custom plugin specs and overrides (`csharp.lua`, `java.lua`, `octo.lua`)
+- `lua/plugins/*.lua`: custom plugin specs and overrides (`csharp.lua`, `java.lua`, `octo.lua`, `review.lua`)
 - `ftplugin/*.lua`: filetype-local settings (`ftplugin/java.lua`)
 
 If you copy this whole `nvim` folder to a new machine, these files are the parts that differ from stock LazyVim behavior.
@@ -49,7 +49,8 @@ The `<leader><leader>` override prevents the search scope from drifting when jum
 
 #### Precognition (`tris203/precognition.nvim`)
 
-Precognition displays contextual motion and text-object hints directly in the current buffer.
+Precognition displays contextual motion and text-object hints directly in the current buffer. It is disabled by
+default to avoid adding cursor-movement overhead; use the commands below when you want hints.
 
 - `:Precognition toggle` - toggle hints for the current session
 - `:Precognition show` - show hints
@@ -122,6 +123,35 @@ Octo is configured in `lua/plugins/octo.lua` and lazy-loads on the `:Octo` comma
    - `<C-r>` - request changes
 
 `<localleader>` is `\` in this setup, so Octo's default review mappings use backslash-prefixed chords.
+
+### Review (`georgeguimaraes/review.nvim`)
+
+Review is configured in `lua/plugins/review.lua` for annotating local Git diffs and exporting the comments as
+AI-ready Markdown. It complements Octo: use Octo to publish GitHub PR reviews and Review to send structured local
+feedback to an AI agent.
+
+#### Entry points
+
+- `<leader>rv` or `:Review` - review staged and unstaged changes
+- `<leader>rV` or `:Review commits` - select commits to review
+- `:Review preview` - preview the exported Markdown
+- `:Review export` - copy the exported Markdown to the clipboard
+
+#### Review workflow
+
+1. Open a review with `<leader>rv`
+2. Navigate files with `<Tab>` and `<S-Tab>`
+3. Press `i` on a line, or after selecting a range, to add a comment
+4. Use `]n` and `[n` to move between comments
+5. Press `C` to export and preview, or `q` to close and automatically copy the Markdown to the clipboard
+6. Paste the exported feedback into the AI agent
+
+#### Temporary version pin
+
+Review is pinned to `v1.9.1` and `codediff.nvim` is pinned to `v2.49.0`. `codediff.nvim` v2.50.0 changed its path API
+and currently breaks Review's session setup and comment rendering. Revisit these pins after
+[`review.nvim` PR #37](https://github.com/georgeguimaraes/review.nvim/pull/37), or an equivalent compatibility fix,
+is released.
 
 ### Lazygit
 
