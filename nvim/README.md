@@ -23,6 +23,47 @@ The `<leader><leader>` override prevents the search scope from drifting when jum
 
 ## Current language/tooling customizations
 
+### Indexed text search
+
+Snacks grep searches use [tgrep](https://github.com/microsoft/tgrep) by default.
+Install tgrep 1.1.0 or newer and put it on `PATH` on each machine, including WSL.
+`<leader>/`, the other grep mappings, word search, and open-buffer grep keep the
+Snacks UI. File-name search and search/replace tools are unchanged.
+
+- Live grep waits for at least three characters before searching. This is a
+  length check, not a guarantee that a regex can use the trigram index.
+- Neovim starts an index server on the first eligible search in each directory.
+  The picker waits for the initial index to be ready instead of running an
+  unindexed scan during the build.
+- Indexes and server logs stay under `stdpath("cache")/tgrep`, outside the
+  repository. Indexes persist across restarts. Home directories and filesystem
+  roots are not indexed.
+- Sessions reuse a running server for the same cache path. On exit, Neovim stops
+  only servers it started. These indexes are separate from Copilot's indexes.
+- Buffer lists, explicit directory lists, ignored files, and followed symlinks
+  use tgrep's direct scan mode to preserve their search scope. These searches
+  do not get the indexed speedup.
+- Index updates follow filesystem events and can lag saves. Add
+  ` -- --no-index` to a grep query when it must read current disk contents.
+- Long result lines have a bounded display; opening a result still jumps to
+  the full file and original match column.
+
+To use the original ripgrep finder for a Neovim session:
+
+```powershell
+$env:NVIM_USE_TGREP = "0"
+nvim
+```
+
+In a Linux/WSL shell, use `NVIM_USE_TGREP=0 nvim`. Unset the variable to restore
+tgrep. Missing tgrep or failed searches produce an error; they do not silently
+switch engines.
+
+The integration is in `lua/search/tgrep.lua`, with picker configuration in
+`lua/plugins/snacks.lua`. Run its real-process checks with
+`nvim --headless -u NONE -l tests/tgrep.lua`; tgrep and the installed Snacks plugin
+are required.
+
 ### WSL2 clipboard
 
 - Uses Windows interoperability for the `+` and `*` registers when Neovim runs under WSL
