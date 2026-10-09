@@ -26,7 +26,8 @@ The `<leader><leader>` override prevents the search scope from drifting when jum
 ### Indexed text search
 
 Snacks grep searches use [tgrep](https://github.com/microsoft/tgrep) by default.
-Install tgrep 1.1.0 or newer and put it on `PATH` on each machine, including WSL.
+Install the tgrep 1.1.0 or newer binary that matches each machine's operating
+system and architecture, and put it on `PATH`. WSL needs its own Linux binary.
 `<leader>/`, the other grep mappings, word search, and open-buffer grep keep the
 Snacks UI. File-name search and search/replace tools are unchanged.
 
@@ -56,8 +57,10 @@ nvim
 ```
 
 In a Linux/WSL shell, use `NVIM_USE_TGREP=0 nvim`. Unset the variable to restore
-tgrep. Missing tgrep or failed searches produce an error; they do not silently
-switch engines.
+tgrep. Without this opt-out, a missing tgrep binary or failed search reports an
+error; Neovim does not silently switch engines. Each machine builds and stores
+its own indexes under its local Neovim cache; indexes are not shared across
+machines or with Copilot CLI.
 
 The integration is in `lua/search/tgrep.lua`, with picker configuration in
 `lua/plugins/snacks.lua`. Run its real-process checks with
